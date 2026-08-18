@@ -1,4 +1,5 @@
-![Uploading image.png…]()
+<img width="1832" height="640" alt="Screenshot 2026-08-18 234945" src="https://github.com/user-attachments/assets/a803ae6e-0347-4c7e-bcae-bc0eb1d7da9a" />
+
 
 # WhatsApp AI Personal Assistant 🤖
 
