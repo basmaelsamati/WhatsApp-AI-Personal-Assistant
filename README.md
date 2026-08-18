@@ -1,3 +1,5 @@
+![Uploading image.png…]()
+
 # WhatsApp AI Personal Assistant 🤖
 
 An AI-powered WhatsApp personal assistant built with **n8n**, **Google Gemini**, **SerpApi**, **Google Calendar**, and **Evolution API**.
