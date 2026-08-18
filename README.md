@@ -198,24 +198,14 @@ Before publishing your own workflow:
 * Remove execution data and pinned webhook data before publishing.
 * Use placeholders such as `YOUR_API_KEY` instead of real values.
 
-### Recommended `.gitignore`
 
-```gitignore
-.env
-.env.*
-credentials.json
-*.key
-*.pem
-secrets/
-```
 
 ## 📁 Project Structure
 
 ```text
 .
 ├── workflow.json
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
 ## ⚠️ Notes
