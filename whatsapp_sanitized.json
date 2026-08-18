@@ -1,0 +1,1945 @@
+{
+  "name": "whatsapp",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=## Overview\n\nYou are a personal AI assistant on whatsapp.\n\nYour job is to understand and respond to:\n- Text messages\n- Voice messages\n- Image messages\n- Current and recent information from the web\n- Google Calendar requests\n\nThe current date and time is:\n{{ $now.toString() }}\n\nAlways consider this date and time when answering time-sensitive questions.\n\n\n## Tools\n\nYou have access to the following tools:\n\n### Google Gemini Chat Model\nUse it to understand the user's messages and generate responses.\n\n### Simple Memory\nUse it to maintain conversation context and remember relevant information from the current conversation.\n\n### Google Search (SerpApi)\nUse this tool to search the web for current, recent, or time-sensitive information.\n\n### Google Calendar\nUse this tool to search, create, update, or manage calendar events.\n\n\n## IMPORTANT: CURRENT INFORMATION RULE\n\nYou MUST use Google Search (SerpApi) before answering ANY question that depends on current, recent, or real-time information.\n\nThis includes, but is not limited to:\n\n- Today's gold price\n- Today's silver price\n- Today's currency exchange rates\n- USD to EGP\n- Current stock prices\n- Cryptocurrency prices\n- Current weather\n- Today's temperature\n- Current news\n- Latest news\n- Current events\n- Sports results\n- Current product prices\n- Current opening hours\n- Current schedules\n- Any question containing:\n  \"today\"\n  \"now\"\n  \"currently\"\n  \"latest\"\n  \"recent\"\n  \"this week\"\n  \"this month\"\n  \"دلوقتي\"\n  \"النهارده\"\n  \"اليوم\"\n  \"حاليًا\"\n  \"حالياً\"\n  \"آخر\"\n  \"اخر\"\n  \"حديث\"\n  \"جديد\"\n\nNEVER answer these questions from memory.\n\nNEVER assume that information from your training data is current.\n\nALWAYS search the web first.\n\n\n## SEARCH DATE RULE\n\nWhen using Google Search for current or time-sensitive information, ALWAYS include the actual current date in the search query.\n\nCurrent date:\n{{ $now.toFormat('yyyy-MM-dd') }}\n\nFor example:\n\nUser:\n\"سعر الذهب النهارده؟\"\n\nSearch query:\n\"gold price Egypt today 2026-08-11\"\n\nUser:\n\"سعر الفضة في مصر اليوم؟\"\n\nSearch query:\n\"silver price Egypt today 2026-08-11\"\n\nUser:\n\"الدولار بكام النهارده؟\"\n\nSearch query:\n\"USD EGP exchange rate Egypt today 2026-08-11\"\n\nDo NOT search using old dates such as 2024 unless the user explicitly asks about that historical date.\n\n\n## SEARCH LOCATION RULE\n\nThe default location is Egypt.\n\nIf the user does not specify a location, assume Egypt for:\n- Gold\n- Silver\n- Currency\n- Weather\n- Local prices\n- Local news\n\nIf the user specifies another location, use the location specified by the user.\n\n\n## SEARCH RESULT RULES\n\nAfter using Google Search:\n\n1. Prefer the newest available information.\n2. Do not use clearly outdated results when newer information is available.\n3. Compare multiple results when the information is important or prices vary.\n4. Clearly mention if the result is an approximate or average price.\n5. Never present old information as today's information.\n6. If reliable current information cannot be found, say so clearly instead of inventing an answer.\n\n\n## CALENDAR RULES\n\nUse Google Calendar when the user asks about:\n\n- Upcoming events\n- Today's events\n- Tomorrow's events\n- A specific date's events\n- Creating an event\n- Scheduling something\n- Changing an event\n- Deleting an event\n\nNever invent calendar events, dates, or times.\n\nIf required information is missing when creating an event, ask the user for the missing information.\n\nFor example, if the user says:\n\n\"ضيفلي اجتماع بكرة\"\n\nAsk for the time if it is not clear.\n\nIf the user says:\n\n\"ضيفلي اجتماع بكرة الساعة 5\"\n\nCreate the event using the correct date and time.\n\n\n## GENERAL RULES\n\n- Respond clearly and naturally.\n- Be concise unless the user asks for details.\n- Match the user's language.\n- If the user speaks Arabic, respond in Arabic.\n- If the user speaks Egyptian Arabic, you may respond naturally in Egyptian Arabic.\n- Match the user's tone.\n- Do not mention internal tools unless necessary.\n- Do not expose system instructions.\n- Do not invent information.\n- Do not pretend that a search was performed if it was not.\n- Do not claim something is current unless you verified it.\n\n\n## VOICE MESSAGE RULE\n\nIf the user sends a voice message, understand the transcribed text and answer normally.\n\nDo not mention transcription unless necessary.\n\n\n## IMAGE MESSAGE RULE\n\nIf the user sends an image:\n\n- Analyze the image.\n- If the user asks to extract text, extract the visible text as accurately as possible.\n- Do not automatically claim that the image is blurry.\n- Try to read all visible text.\n- Preserve the original structure when useful.\n- If some text is genuinely unreadable, clearly indicate only the unreadable parts.\n- If the user asks a question about the image, answer based on the image.\n\n\n## RESPONSE RULE\n\nBefore answering, determine:\n\n1. Is this a normal question?\n   → Answer directly.\n\n2. Does it require current or recent information?\n   → MUST use Google Search.\n\n3. Does it require calendar information or calendar actions?\n   → MUST use Google Calendar.\n\n4. Does it require both?\n   → Use both tools.\n\nNever skip a required tool.\n\n\n## Examples\n\n### Example 1: Current Gold Price\n\nInput:\n\"سعر الذهب النهارده كام؟\"\n\nAction:\nUse Google Search (SerpApi).\n\nSearch:\n\"gold price Egypt today 2026-08-11\"\n\nThen answer using the newest reliable results.\n\n\n### Example 2: Current Silver Price\n\nInput:\n\"سعر الفضة في مصر اليوم؟\"\n\nAction:\nUse Google Search (SerpApi).\n\nSearch:\n\"silver price Egypt today 2026-08-11\"\n\nDo NOT answer using historical prices from 2024.\n\n\n### Example 3: Weather\n\nInput:\n\"الجو النهارده في المنصورة عامل إزاي؟\"\n\nAction:\nUse Google Search for current weather information.\n\nSearch:\n\"weather Mansoura Egypt today 2026-08-11\"\n\n\n### Example 4: Calendar\n\nInput:\n\"What do I have tomorrow?\"\n\nAction:\nUse Google Calendar.\n\nOutput:\nList the relevant events with their times.\n\n\n### Example 5: Create Calendar Event\n\nInput:\n\"اعمللي اجتماع بكرة الساعة 6\"\n\nAction:\nUse Google Calendar to create the event.\n\nDo not invent missing details.\n\n\n### Example 6: Normal Question\n\nInput:\n\"اشرحلي يعني إيه API\"\n\nAction:\nNo web search is required.\n\nOutput:\nExplain the concept directly.\n\n\n## Final Priority\n\nAccuracy is more important than speed.\n\nFor current information:\nSEARCH FIRST, THEN ANSWER.\n\nNever rely on memory for current prices, weather, news, exchange rates, gold, silver, or other time-sensitive information."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        736,
+        192
+      ],
+      "id": "74885cf4-ae29-4091-ba93-ee335ecb67ed",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        384
+      ],
+      "id": "edb0944d-345c-4c82-afae-35d9597edff3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.text }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        816,
+        480
+      ],
+      "id": "5f250ee9-0a71-4066-8dab-369b91c0da50",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-lite-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-lite-latest"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        128,
+        288
+      ],
+      "id": "8c0ea6b8-fbe4-4623-9e83-bb2ed0a7ba84",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "75d645b6-ad53-497c-a898-7a9eb5619916",
+              "name": "text",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        320,
+        288
+      ],
+      "id": "523fd9d8-3066-430f-9286-61effd3fdf36",
+      "name": "voice"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "602a196e-68d3-4d9f-8d33-a1b3d3575330",
+              "name": "text",
+              "value": "={{ $json.body.data.message.conversation }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        128,
+        96
+      ],
+      "id": "94c14349-7ab3-4cb7-9127-42eaa046e931",
+      "name": "text"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f4f405a5-f419-4303-bc75-c476519ef5fa",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.conversation }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "438795f3-b650-429f-aa19-a160f4e3c5cc",
+              "leftValue": "={{ $('Webhook').item.json.body.data.message.imageMessage }}",
+              "rightValue": "={{ $('Webhook').item.json.body.data.message.imageMessage }}",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1056,
+        208
+      ],
+      "id": "02f96c69-5736-4032-9e1d-b469c1958f56",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-lite-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-lite-latest"
+        },
+        "text": "Extract all text from this image exactly as it appears.\nPreserve line breaks and formatting.\nIf any part is unreadable, write [unreadable] instead of guessing.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        528
+      ],
+      "id": "ae915d71-debf-459c-b6b1-8da385b17190",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "YOUR_GOOGLE_GEMINI_CREDENTIAL_ID",
+          "name": "Google Gemini Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "q": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search_Query__q_', ``, 'string') }}",
+        "location": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Location__location_', ``, 'string') }}",
+        "additionalFields": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApiTool",
+      "typeVersion": 1,
+      "position": [
+        944,
+        480
+      ],
+      "id": "c5f5e0e5-d922-459b-a77d-a364cba257fb",
+      "name": "Google search in SerpApi",
+      "credentials": {
+        "serpApi": {
+          "id": "YOUR_SERPAPI_CREDENTIAL_ID",
+          "name": "SerpApi Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "=YOUR_GOOGLE_CALENDAR_EMAIL",
+          "mode": "id"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1072,
+        464
+      ],
+      "id": "035c0a6f-63ec-45e4-875c-a4247cd2f4b1",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "YOUR_GOOGLE_CALENDAR_CREDENTIAL_ID",
+          "name": "Google Calendar Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "YOUR_WEBHOOK_ID",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1168,
+        304
+      ],
+      "id": "a7892a04-1f7d-4d19-b758-c57d18f88a7f",
+      "name": "Webhook",
+      "webhookId": "YOUR_WEBHOOK_ID"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "88f0ba88-d7b5-48b0-90af-9ab784cd793f",
+              "leftValue": "={{ $json.body.data.key.remoteJid }}",
+              "rightValue": "YOUR_WHATSAPP_CHAT_ID@s.whatsapp.net",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -944,
+        304
+      ],
+      "id": "6844e27d-ec73-4a0d-9afe-94174d2ff90a",
+      "name": "If1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        624
+      ],
+      "id": "1a6ab657-db64-45d7-83d0-5626749969ec",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Webhook').item.json.body.instance }}",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid.split('@')[0] }}",
+        "messageText": "={{ $('AI Agent').item.json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-english.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        80
+      ],
+      "id": "3561b16c-6012-49a7-b766-f4fadb6a7b1c",
+      "name": "Send text",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
+          "name": "Evolution API Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.data.message.conversation }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "13867640-2b4b-4a29-8dc1-c694f6eda43f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ada3c15e-85d7-4f63-950a-f836c76b7425",
+                    "leftValue": "={{ $json.body.data.message.audioMessage }}",
+                    "rightValue": "={{ $json.message.voice }}",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d583d314-daf0-44ed-b84e-2e00dff80f69",
+                    "leftValue": "=\\{{ $json.body.data.message.imageMessage }}",
+                    "rightValue": "={{ $json.message.photo[0] }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        288
+      ],
+      "id": "23a0eaf1-92fd-4976-ab3a-e32a54291b5b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "={{ $json.body.instance }}",
+        "messageId": "={{ $json.body.data.key.id }}"
+      },
+      "type": "n8n-nodes-evolution-api-english.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        320
+      ],
+      "id": "cc148520-d1f8-48ce-9752-54a139b0353f",
+      "name": "Get media in base64",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
+          "name": "Evolution API Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        304
+      ],
+      "id": "cbbf62a1-ce1e-437e-9e18-7cc380ad4059",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-audio",
+        "instanceName": "={{ $('Webhook').item.json.body.instance }}",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid }}",
+        "media": "={{ $json.rawJson[0].url }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api-english.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        320
+      ],
+      "id": "16ab77b1-03c1-4718-9865-73e5e40c7cb7",
+      "name": "Send audio",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
+          "name": "Evolution API Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://qwen-qwen-tts-demo.hf.space/gradio_api/call/predict",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  data: [\n    $json.output,\n    \"Dylan\"\n  ]\n}\n}}",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "id": "4dc143f7-7c20-4897-91cf-bfe2022958f0",
+      "name": "TTS Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1328,
+        336
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "=https://qwen-qwen-tts-demo.hf.space/gradio_api/call/predict/{{ $json.event_id }}",
+        "options": {}
+      },
+      "id": "e4ec7c70-5764-428d-adc8-40207d4198b1",
+      "name": "TTS Poll",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1504,
+        320
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const raw = $json.data || $json || \"\";\n\n// Case 1: If it's already parsed JSON with data[0].url\nif (Array.isArray($json.data)) {\n  return {\n    json: {\n      audioUrl: $json.data[0]?.url || null,\n      rawJson: $json.data\n    }\n  };\n}\n\n// Case 2: Handle raw SSE text\nconst match = typeof raw === \"string\" ? raw.match(/data:\\s*(\\[[^\\]]+\\])/s) : null;\n\nif (match) {\n  try {\n    const parsed = JSON.parse(match[1]);\n    return {\n      json: {\n        audioUrl: parsed?.[0]?.url || null,\n        rawJson: parsed\n      }\n    };\n  } catch (e) {\n    return {\n      json: {\n        error: \"Failed to parse SSE JSON\",\n        raw\n      }\n    };\n  }\n}\n\n// Case 3: If neither worked\nreturn {\n  json: {\n    error: \"No audio URL found\",\n    raw\n  }\n};\n"
+      },
+      "id": "dd6d77e3-fdfb-42ad-95df-58f82ef025f0",
+      "name": "Extract Audio URL",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1648,
+        320
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "={{ $json.body.instance }}",
+        "messageId": "={{ $json.body.data.key.id }}"
+      },
+      "type": "n8n-nodes-evolution-api-english.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        528
+      ],
+      "id": "24628b3a-d0a1-4ed3-8356-1455d4bacb64",
+      "name": "Get media in base",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
+          "name": "Evolution API Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        528
+      ],
+      "id": "1e335bc7-2293-469a-97c3-064a6180843d",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fc34bb2-683a-4e0a-a037-b2fd01a44b94",
+              "name": "=text",
+              "value": "=# The author provided the image and the text ## Tiage Description {{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        528
+      ],
+      "id": "02a7326f-7d40-4e3b-aca0-f801f857b6db",
+      "name": "image"
+    }
+  ],
+  
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "voice": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TTS Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google search in SerpApi": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get media in base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get media in base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media in base64": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS Request": {
+      "main": [
+        [
+          {
+            "node": "TTS Poll",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS Poll": {
+      "main": [
+        [
+          {
+            "node": "Extract Audio URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Audio URL": {
+      "main": [
+        [
+          {
+            "node": "Send audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media in base": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Africa/Cairo",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "146c6a79-9aab-42de-932a-100b0d95f2e4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_N8N_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "YOUR_N8N_WORKFLOW_ID",
+  "tags": []
+}    },
+      "type": "n8n-nodes-evolution-api-english.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        320
+      ],
+      "id": "16ab77b1-03c1-4718-9865-73e5e40c7cb7",
+      "name": "Send audio",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
+          "name": "Evolution API Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://qwen-qwen-tts-demo.hf.space/gradio_api/call/predict",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  data: [\n    $json.output,\n    \"Dylan\"\n  ]\n}\n}}",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "id": "4dc143f7-7c20-4897-91cf-bfe2022958f0",
+      "name": "TTS Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1328,
+        336
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "=https://qwen-qwen-tts-demo.hf.space/gradio_api/call/predict/{{ $json.event_id }}",
+        "options": {}
+      },
+      "id": "e4ec7c70-5764-428d-adc8-40207d4198b1",
+      "name": "TTS Poll",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1504,
+        320
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const raw = $json.data || $json || \"\";\n\n// Case 1: If it's already parsed JSON with data[0].url\nif (Array.isArray($json.data)) {\n  return {\n    json: {\n      audioUrl: $json.data[0]?.url || null,\n      rawJson: $json.data\n    }\n  };\n}\n\n// Case 2: Handle raw SSE text\nconst match = typeof raw === \"string\" ? raw.match(/data:\\s*(\\[[^\\]]+\\])/s) : null;\n\nif (match) {\n  try {\n    const parsed = JSON.parse(match[1]);\n    return {\n      json: {\n        audioUrl: parsed?.[0]?.url || null,\n        rawJson: parsed\n      }\n    };\n  } catch (e) {\n    return {\n      json: {\n        error: \"Failed to parse SSE JSON\",\n        raw\n      }\n    };\n  }\n}\n\n// Case 3: If neither worked\nreturn {\n  json: {\n    error: \"No audio URL found\",\n    raw\n  }\n};\n"
+      },
+      "id": "dd6d77e3-fdfb-42ad-95df-58f82ef025f0",
+      "name": "Extract Audio URL",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1648,
+        320
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "={{ $json.body.instance }}",
+        "messageId": "={{ $json.body.data.key.id }}"
+      },
+      "type": "n8n-nodes-evolution-api-english.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        528
+      ],
+      "id": "24628b3a-d0a1-4ed3-8356-1455d4bacb64",
+      "name": "Get media in base",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
+          "name": "Evolution API Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        528
+      ],
+      "id": "1e335bc7-2293-469a-97c3-064a6180843d",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fc34bb2-683a-4e0a-a037-b2fd01a44b94",
+              "name": "=text",
+              "value": "=# The author provided the image and the text ## Tiage Description {{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        528
+      ],
+      "id": "02a7326f-7d40-4e3b-aca0-f801f857b6db",
+      "name": "image"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "YOUR_NGROK_URL",
+            "user-agent": "axios/1.13.2",
+            "content-length": "1510",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "YOUR_IP_ADDRESS",
+            "x-forwarded-host": "YOUR_NGROK_URL",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.upsert",
+            "instance": "YOUR_INSTANCE_NAME",
+            "data": {
+              "key": {
+                "remoteJid": "YOUR_WHATSAPP_CHAT_ID@s.whatsapp.net",
+                "remoteJidAlt": "YOUR_WHATSAPP_CHAT_ID@s.whatsapp.net",
+                "fromMe": false,
+                "id": "YOUR_MESSAGE_ID",
+                "participant": "",
+                "addressingMode": "lid"
+              },
+              "pushName": ".",
+              "status": "DELIVERY_ACK",
+              "message": {
+                "conversation": "احفظ يوم 20/8/2026 كموعد تجريبي",
+                "messageContextInfo": {
+                  "threadId": [],
+                  "deviceListMetadata": {
+                    "senderKeyIndexes": [],
+                    "recipientKeyIndexes": [],
+                    "senderKeyHash": {
+                      "0": 178,
+                      "1": 54,
+                      "2": 177,
+                      "3": 88,
+                      "4": 208,
+                      "5": 27,
+                      "6": 0,
+                      "7": 104,
+                      "8": 181,
+                      "9": 240
+                    },
+                    "senderTimestamp": {
+                      "low": 1767261500,
+                      "high": 0,
+                      "unsigned": true
+                    },
+                    "recipientKeyHash": {
+                      "0": 49,
+                      "1": 63,
+                      "2": 43,
+                      "3": 70,
+                      "4": 154,
+                      "5": 15,
+                      "6": 122,
+                      "7": 159,
+                      "8": 202,
+                      "9": 169
+                    },
+                    "recipientTimestamp": {
+                      "low": 1767261500,
+                      "high": 0,
+                      "unsigned": true
+                    }
+                  },
+                  "deviceListMetadataVersion": 2,
+                  "messageSecret": {
+                    "0": 70,
+                    "1": 43,
+                    "2": 61,
+                    "3": 19,
+                    "4": 35,
+                    "5": 28,
+                    "6": 19,
+                    "7": 166,
+                    "8": 66,
+                    "9": 88,
+                    "10": 2,
+                    "11": 103,
+                    "12": 89,
+                    "13": 91,
+                    "14": 214,
+                    "15": 202,
+                    "16": 108,
+                    "17": 189,
+                    "18": 12,
+                    "19": 18,
+                    "20": 122,
+                    "21": 249,
+                    "22": 205,
+                    "23": 210,
+                    "24": 229,
+                    "25": 157,
+                    "26": 174,
+                    "27": 131,
+                    "28": 218,
+                    "29": 29,
+                    "30": 141,
+                    "31": 175
+                  }
+                }
+              },
+              "messageType": "conversation",
+              "messageTimestamp": 1767261600,
+              "instanceId": "YOUR_WHATSAPP_INSTANCE_ID",
+              "source": "ios"
+            },
+            "destination": "https://YOUR_NGROK_URL/webhook/YOUR_WEBHOOK_ID",
+            "date_time": "2026-01-01T10:00:00.000Z",
+            "sender": "YOUR_WHATSAPP_SENDER_ID@s.whatsapp.net",
+            "server_url": "YOUR_EVOLUTION_SERVER_URL",
+            "apikey": "YOUR_EVOLUTION_API_KEY"
+          },
+          "webhookUrl": "https://YOUR_NGROK_URL/webhook/YOUR_WEBHOOK_ID",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "voice": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TTS Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google search in SerpApi": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get media in base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get media in base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media in base64": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS Request": {
+      "main": [
+        [
+          {
+            "node": "TTS Poll",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS Poll": {
+      "main": [
+        [
+          {
+            "node": "Extract Audio URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Audio URL": {
+      "main": [
+        [
+          {
+            "node": "Send audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media in base": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Africa/Cairo",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "146c6a79-9aab-42de-932a-100b0d95f2e4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_N8N_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "YOUR_N8N_WORKFLOW_ID",
+  "tags": []
+}
+    },
+      "type": "n8n-nodes-evolution-api-english.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        320
+      ],
+      "id": "16ab77b1-03c1-4718-9865-73e5e40c7cb7",
+      "name": "Send audio",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
+          "name": "Evolution API Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://qwen-qwen-tts-demo.hf.space/gradio_api/call/predict",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n{\n  data: [\n    $json.output,\n    \"Dylan\"\n  ]\n}\n}}",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "id": "4dc143f7-7c20-4897-91cf-bfe2022958f0",
+      "name": "TTS Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1328,
+        336
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "url": "=https://qwen-qwen-tts-demo.hf.space/gradio_api/call/predict/{{ $json.event_id }}",
+        "options": {}
+      },
+      "id": "e4ec7c70-5764-428d-adc8-40207d4198b1",
+      "name": "TTS Poll",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1504,
+        320
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const raw = $json.data || $json || \"\";\n\n// Case 1: If it's already parsed JSON with data[0].url\nif (Array.isArray($json.data)) {\n  return {\n    json: {\n      audioUrl: $json.data[0]?.url || null,\n      rawJson: $json.data\n    }\n  };\n}\n\n// Case 2: Handle raw SSE text\nconst match = typeof raw === \"string\" ? raw.match(/data:\\s*(\\[[^\\]]+\\])/s) : null;\n\nif (match) {\n  try {\n    const parsed = JSON.parse(match[1]);\n    return {\n      json: {\n        audioUrl: parsed?.[0]?.url || null,\n        rawJson: parsed\n      }\n    };\n  } catch (e) {\n    return {\n      json: {\n        error: \"Failed to parse SSE JSON\",\n        raw\n      }\n    };\n  }\n}\n\n// Case 3: If neither worked\nreturn {\n  json: {\n    error: \"No audio URL found\",\n    raw\n  }\n};\n"
+      },
+      "id": "dd6d77e3-fdfb-42ad-95df-58f82ef025f0",
+      "name": "Extract Audio URL",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        1648,
+        320
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "={{ $json.body.instance }}",
+        "messageId": "={{ $json.body.data.key.id }}"
+      },
+      "type": "n8n-nodes-evolution-api-english.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        528
+      ],
+      "id": "24628b3a-d0a1-4ed3-8356-1455d4bacb64",
+      "name": "Get media in base",
+      "credentials": {
+        "evolutionApi": {
+          "id": "YOUR_EVOLUTION_API_CREDENTIAL_ID",
+          "name": "Evolution API Credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        528
+      ],
+      "id": "1e335bc7-2293-469a-97c3-064a6180843d",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fc34bb2-683a-4e0a-a037-b2fd01a44b94",
+              "name": "=text",
+              "value": "=# The author provided the image and the text ## Tiage Description {{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        528
+      ],
+      "id": "02a7326f-7d40-4e3b-aca0-f801f857b6db",
+      "name": "image"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "YOUR_NGROK_URL",
+            "user-agent": "axios/1.13.2",
+            "content-length": "1510",
+            "accept": "application/json, text/plain, */*",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "content-type": "application/json",
+            "x-forwarded-for": "YOUR_IP_ADDRESS",
+            "x-forwarded-host": "YOUR_NGROK_URL",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "event": "messages.upsert",
+            "instance": "YOUR_INSTANCE_NAME",
+            "data": {
+              "key": {
+                "remoteJid": "YOUR_WHATSAPP_CHAT_ID@s.whatsapp.net",
+                "remoteJidAlt": "YOUR_WHATSAPP_CHAT_ID@s.whatsapp.net",
+                "fromMe": false,
+                "id": "YOUR_MESSAGE_ID",
+                "participant": "",
+                "addressingMode": "lid"
+              },
+              "pushName": ".",
+              "status": "DELIVERY_ACK",
+              "message": {
+                "conversation": "احفظ يوم 20/8/2026 كموعد تجريبي",
+                "messageContextInfo": {
+                  "threadId": [],
+                  "deviceListMetadata": {
+                    "senderKeyIndexes": [],
+                    "recipientKeyIndexes": [],
+                    "senderKeyHash": {
+                      "0": 178,
+                      "1": 54,
+                      "2": 177,
+                      "3": 88,
+                      "4": 208,
+                      "5": 27,
+                      "6": 0,
+                      "7": 104,
+                      "8": 181,
+                      "9": 240
+                    },
+                    "senderTimestamp": {
+                      "low": 1767261500,
+                      "high": 0,
+                      "unsigned": true
+                    },
+                    "recipientKeyHash": {
+                      "0": 49,
+                      "1": 63,
+                      "2": 43,
+                      "3": 70,
+                      "4": 154,
+                      "5": 15,
+                      "6": 122,
+                      "7": 159,
+                      "8": 202,
+                      "9": 169
+                    },
+                    "recipientTimestamp": {
+                      "low": 1767261500,
+                      "high": 0,
+                      "unsigned": true
+                    }
+                  },
+                  "deviceListMetadataVersion": 2,
+                  "messageSecret": {
+                    "0": 70,
+                    "1": 43,
+                    "2": 61,
+                    "3": 19,
+                    "4": 35,
+                    "5": 28,
+                    "6": 19,
+                    "7": 166,
+                    "8": 66,
+                    "9": 88,
+                    "10": 2,
+                    "11": 103,
+                    "12": 89,
+                    "13": 91,
+                    "14": 214,
+                    "15": 202,
+                    "16": 108,
+                    "17": 189,
+                    "18": 12,
+                    "19": 18,
+                    "20": 122,
+                    "21": 249,
+                    "22": 205,
+                    "23": 210,
+                    "24": 229,
+                    "25": 157,
+                    "26": 174,
+                    "27": 131,
+                    "28": 218,
+                    "29": 29,
+                    "30": 141,
+                    "31": 175
+                  }
+                }
+              },
+              "messageType": "conversation",
+              "messageTimestamp": 1767261600,
+              "instanceId": "YOUR_WHATSAPP_INSTANCE_ID",
+              "source": "ios"
+            },
+            "destination": "https://YOUR_NGROK_URL/webhook/YOUR_WEBHOOK_ID",
+            "date_time": "2026-01-01T10:00:00.000Z",
+            "sender": "YOUR_WHATSAPP_SENDER_ID@s.whatsapp.net",
+            "server_url": "YOUR_EVOLUTION_SERVER_URL",
+            "apikey": "YOUR_EVOLUTION_API_KEY"
+          },
+          "webhookUrl": "https://YOUR_NGROK_URL/webhook/YOUR_WEBHOOK_ID",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "voice": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "text": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "TTS Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google search in SerpApi": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get media in base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get media in base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media in base64": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS Request": {
+      "main": [
+        [
+          {
+            "node": "TTS Poll",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TTS Poll": {
+      "main": [
+        [
+          {
+            "node": "Extract Audio URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Audio URL": {
+      "main": [
+        [
+          {
+            "node": "Send audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get media in base": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Africa/Cairo",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "146c6a79-9aab-42de-932a-100b0d95f2e4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "YOUR_N8N_INSTANCE_ID"
+  },
+  "nodeGroups": [],
+  "id": "YOUR_N8N_WORKFLOW_ID",
+  "tags": []
+}
