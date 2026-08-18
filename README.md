@@ -226,25 +226,3 @@ The TTS functionality uses a public Qwen TTS endpoint. Availability or API behav
 
 For production deployments, consider running the required services in your own controlled environment.
 
-## 🚀 Future Improvements
-
-Possible improvements include:
-
-* Persistent conversation memory
-* Multiple WhatsApp users
-* User-specific preferences
-* Better image understanding
-* More calendar operations
-* Reminder automation
-* Email integration
-* CRM integration
-* More advanced AI agents
-* Error handling and retry mechanisms
-* Logging and monitoring
-* Authentication and access control
-
-## 📄 License
-
-Choose a license that matches how you want others to use and modify this workflow.
-
-For example, you can use the MIT License if you want to allow others to freely use, modify, and distribute the project.
